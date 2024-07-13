@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disk-writer
+  namespace: default
+spec:
+  volumes:
+  - name: data
+    hostPath:
+      path: /data
+  containers:
+  - name: disk-writer
+    image: "registrygodoy.azurecr.io/diskwriter:v1"
+    volumeMounts:
+    - name: data
+      mountPath: /app/data
