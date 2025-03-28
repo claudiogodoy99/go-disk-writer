@@ -4,7 +4,7 @@ FROM golang:1.21.0
 WORKDIR /app
 
 # Download Go modules
-COPY go.mod ./
+COPY go.* ./
 RUN go mod download
 
 # Copy the source code. Note the slash at the end, as explained in
@@ -16,3 +16,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /file-writer
 
 # Run
 CMD ["/file-writer", "-p", "./data"]
+
+EXPOSE 9090

@@ -2,15 +2,32 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disk-writer
+  labels: 
+    "app": "disk-writer" 
+    "environment": "test"
   namespace: default
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: '/metrics'
+    prometheus.io/port: '9090'
+
 spec:
+  # selector:
+  #   matchLabels: 
+  #     "app": "disk-writer" 
+  #     "environment": "test"
   volumes:
   - name: data
     hostPath:
-      path: /data
+      path: /datakubens 
   containers:
   - name: disk-writer
-    image: "registrygodoy.azurecr.io/diskwriter:v1"
+    image: "craksgodoy.azurecr.io/go-disk-writer:v2"
     volumeMounts:
     - name: data
       mountPath: /app/data
+    ports:
+    - containerPort: 9090
+      name: metrics
+      protocol: TCP
+    

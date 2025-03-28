@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func openFile(path string, currentFile int) (*os.File, error) {
@@ -52,6 +55,8 @@ func writeLoop(path string, maxFileSize int, count int) error {
 }
 
 func main() {
+	go serveMetrics()
+
 	var pathFlag = flag.String("p", "", "Directory to write files to")
 	var sizeFlag = flag.Int("s", 10*1024*1024*1024, "Size of each file (default 10GB)")
 	var countFlag = flag.Int("n", 3, "Number of files to write (default 3)")
@@ -75,4 +80,14 @@ func main() {
 		panic(err)
 	}
 	time.Sleep(1 * time.Hour)
+}
+
+func serveMetrics() {
+	fmt.Printf("serving metrics at localhost:2223/metrics")
+	http.Handle("/metrics", promhttp.Handler())
+	err := http.ListenAndServe(":9090", nil) //nolint:gosec // Ignoring G114: Use of net/http serve function that has no support for setting timeouts.
+	if err != nil {
+		fmt.Printf("error serving http: %v", err)
+		return
+	}
 }

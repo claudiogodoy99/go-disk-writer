@@ -1,0 +1,20 @@
+apiVersion: azmonitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: pod-monitor-job
+spec:
+  labelLimit: 63
+  labelNameLengthLimit: 511
+  labelValueLengthLimit: 1023
+  selector:
+    matchLabels:
+      app: disk-writer
+  podMetricsEndpoints:
+  - relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_label_app]
+      action: keep
+      regex: "disk-writer"
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      action: replace
+      regex: ('$$NODE_NAME$$')
+      targetLabel: instance
